@@ -41,6 +41,96 @@ if (btnManualAdd) {
   });
 }
 
+// Extração Inteligente de Texto Colado (Smart Paste)
+const btnSmartParse = document.getElementById('btnSmartParse');
+const smartPasteText = document.getElementById('smartPasteText');
+
+if (btnSmartParse && smartPasteText) {
+  btnSmartParse.addEventListener('click', () => {
+    const raw = smartPasteText.value.trim();
+    if (!raw) {
+      alert('Por favor, cole um texto com título, preço ou link antes.');
+      return;
+    }
+
+    productForm.reset();
+    document.getElementById('prodId').value = '';
+    modalTitle.textContent = 'Adicionar Produto (Extraído do Texto)';
+
+    // Extrai URLs
+    const urls = raw.match(/https?:\/\/[^\s"'<>]+/gi) || [];
+    let imgUrl = '';
+    let affUrl = '';
+
+    urls.forEach(u => {
+      if (u.match(/\.(jpg|jpeg|png|webp|avif)/i) || u.includes('mlstatic.com') || u.includes('susercontent.com')) {
+        if (!imgUrl) imgUrl = u;
+      } else {
+        if (!affUrl) affUrl = u;
+      }
+    });
+
+    // Detecta loja
+    let storeName = 'Shopee';
+    if (raw.toLowerCase().includes('mercado livre') || (affUrl && affUrl.includes('mercadolivre'))) {
+      storeName = 'Mercado Livre';
+    } else if (raw.toLowerCase().includes('amazon') || (affUrl && affUrl.includes('amazon'))) {
+      storeName = 'Amazon';
+    } else if (raw.toLowerCase().includes('aliexpress') || (affUrl && affUrl.includes('aliexpress'))) {
+      storeName = 'AliExpress';
+    } else if (raw.toLowerCase().includes('shopee') || (affUrl && affUrl.includes('shopee'))) {
+      storeName = 'Shopee';
+    }
+
+    // Extrai preços (R$ xx,xx ou xx.xx)
+    const priceMatches = raw.match(/R\$\s*[\d\.,]+/gi) || [];
+    let prices = [];
+    priceMatches.forEach(p => {
+      let num = p.replace(/[^\d,\.]/g, '').trim();
+      if (num.includes(',') && num.includes('.')) {
+        num = num.replace('.', '').replace(',', '.');
+      } else if (num.includes(',')) {
+        num = num.replace(',', '.');
+      }
+      const val = parseFloat(num);
+      if (!isNaN(val) && val > 0 && !prices.includes(val)) {
+        prices.push(val);
+      }
+    });
+
+    // Extrai título (primeira linha não vazia que não seja só preço ou url)
+    const lines = raw.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+    let title = '';
+    for (const line of lines) {
+      if (!line.startsWith('http') && !line.startsWith('R$') && line.length > 5) {
+        title = line;
+        break;
+      }
+    }
+
+    document.getElementById('prodTitle').value = title || 'Novo Produto';
+    document.getElementById('prodStore').value = storeName;
+    document.getElementById('prodAffiliateUrl').value = affUrl || '';
+    document.getElementById('prodImageUrl').value = imgUrl || '';
+
+    if (prices.length === 1) {
+      document.getElementById('prodCurrentPrice').value = prices[0];
+    } else if (prices.length >= 2) {
+      // Ordena: o menor é o preço promocional, o maior é o antigo
+      prices.sort((a, b) => a - b);
+      document.getElementById('prodCurrentPrice').value = prices[0];
+      document.getElementById('prodOriginalPrice').value = prices[1];
+    }
+
+    if (imgUrl) {
+      imagePreview.src = imgUrl;
+      imagePreviewBox.style.display = 'block';
+    }
+
+    openModal();
+  });
+}
+
 // Busca Automática de Metadados via URL
 if (urlFetchForm) {
   urlFetchForm.addEventListener('submit', async (e) => {

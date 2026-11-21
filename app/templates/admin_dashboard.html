@@ -70,27 +70,39 @@
       <div class="admin-card-header">
         <div class="admin-card-title">
           <i class="fa-solid fa-wand-magic-sparkles" style="color: var(--primary);"></i>
-          <span>Adicionar Novo Produto (Busca Automática)</span>
+          <span>Adicionar Novo Produto</span>
         </div>
       </div>
 
+      <!-- Importação Direta por Link -->
       <form id="urlFetchForm">
         <div class="form-group">
-          <label class="form-label" for="scrapeUrl">Cole o link do produto</label>
+          <label class="form-label" for="scrapeUrl">Cole o link do produto (Shopee, Mercado Livre, Amazon, etc.)</label>
           <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
-            <input type="url" id="scrapeUrl" class="form-control" style="flex: 1; min-width: 250px;" placeholder="https://www.exemplo.com/produto" required>
+            <input type="url" id="scrapeUrl" class="form-control" style="flex: 1; min-width: 250px;" placeholder="https://shopee.com.br/... ou https://produto.mercadolivre.com.br/..." required>
             <button type="submit" id="btnFetchData" class="btn btn-primary">
               <i class="fa-solid fa-bolt"></i> Obter Dados Automaticamente
             </button>
             <button type="button" id="btnManualAdd" class="btn btn-secondary">
-              <i class="fa-solid fa-pen-to-square"></i> Preencher Manualmente
+              <i class="fa-solid fa-pen-to-square"></i> Preenchimento Manual
             </button>
           </div>
-          <small style="color: var(--text-muted); font-size: 0.78rem; display: block; margin-top: 0.4rem;">
-            O sistema tentará extrair imagem, título, preço e loja utilizando metadados públicos Open Graph e dados estruturados JSON-LD.
-          </small>
         </div>
       </form>
+
+      <!-- Importador Inteligente de Texto Rápido (Copia e Cola da Loja) -->
+      <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px dashed var(--admin-border);">
+        <label class="form-label" style="display: flex; align-items: center; justify-content: space-between;">
+          <span><strong>⚡ Importador Instantâneo (Copiar e Colar)</strong>: cole o texto da página ou anúncio</span>
+          <span style="font-size: 0.72rem; color: var(--primary); font-weight: 700;">Zero falhas com anti-bot!</span>
+        </label>
+        <textarea id="smartPasteText" class="form-control" rows="2" placeholder="Cole aqui qualquer texto copiado do anúncio (título, preço R$ 49,90, link da foto) que o sistema identifica e preenche os campos num clique..."></textarea>
+        <div style="display: flex; justify-content: flex-end; margin-top: 0.4rem;">
+          <button type="button" id="btnSmartParse" class="btn btn-secondary btn-sm" style="background: #e0e7ff; color: var(--primary); font-weight: 700;">
+            <i class="fa-solid fa-wand-magic"></i> Extrair Dados do Texto Colado
+          </button>
+        </div>
+      </div>
     </section>
 
     <!-- LISTA DE PRODUTOS CADASTRADOS -->
