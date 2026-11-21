@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard | V Variedades</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="/static/css/admin.css">
+</head>
+<body class="admin-body">
+
+  <!-- TOP NAV -->
+  <header class="admin-navbar">
+    <a href="/admin" class="admin-nav-brand">
+      <span class="logo-box">V</span>
+      <span>V Variedades Admin</span>
+    </a>
+    <div class="admin-nav-actions">
+      <a href="/" target="_blank" class="btn btn-secondary btn-sm">
+        <i class="fa-solid fa-arrow-up-right-from-square"></i> Ver Vitrine
+      </a>
+      <a href="/admin/logout" class="btn btn-danger btn-sm">
+        <i class="fa-solid fa-right-from-bracket"></i> Sair
+      </a>
+    </div>
+  </header>
+
+  <main class="admin-wrapper">
+
+    <!-- RESUMO / ESTATÍSTICAS -->
+    <section class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon blue"><i class="fa-solid fa-box"></i></div>
+        <div class="stat-info">
+          <h4>Total de Produtos</h4>
+          <div class="stat-number">{{ stats.total }}</div>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon green"><i class="fa-solid fa-circle-check"></i></div>
+        <div class="stat-info">
+          <h4>Produtos Ativos</h4>
+          <div class="stat-number">{{ stats.active }}</div>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon amber"><i class="fa-solid fa-star"></i></div>
+        <div class="stat-info">
+          <h4>Em Destaque</h4>
+          <div class="stat-number">{{ stats.featured }}</div>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon purple"><i class="fa-solid fa-tags"></i></div>
+        <div class="stat-info">
+          <h4>Categorias Ativas</h4>
+          <div class="stat-number">{{ stats.categories_count }}</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CADASTRO AUTOMÁTICO DE PRODUTOS -->
+    <section class="admin-card">
+      <div class="admin-card-header">
+        <div class="admin-card-title">
+          <i class="fa-solid fa-wand-magic-sparkles" style="color: var(--primary);"></i>
+          <span>Adicionar Novo Produto (Busca Automática)</span>
+        </div>
+      </div>
+
+      <form id="urlFetchForm">
+        <div class="form-group">
+          <label class="form-label" for="scrapeUrl">Cole o link do produto</label>
+          <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+            <input type="url" id="scrapeUrl" class="form-control" style="flex: 1; min-width: 250px;" placeholder="https://www.exemplo.com/produto" required>
+            <button type="submit" id="btnFetchData" class="btn btn-primary">
+              <i class="fa-solid fa-bolt"></i> Obter Dados Automaticamente
+            </button>
+            <button type="button" id="btnManualAdd" class="btn btn-secondary">
+              <i class="fa-solid fa-pen-to-square"></i> Preencher Manualmente
+            </button>
+          </div>
+          <small style="color: var(--text-muted); font-size: 0.78rem; display: block; margin-top: 0.4rem;">
+            O sistema tentará extrair imagem, título, preço e loja utilizando metadados públicos Open Graph e dados estruturados JSON-LD.
+          </small>
+        </div>
+      </form>
+    </section>
+
+    <!-- LISTA DE PRODUTOS CADASTRADOS -->
+    <section class="admin-card">
+      <div class="admin-card-header">
+        <div class="admin-card-title">
+          <i class="fa-solid fa-list-check"></i>
+          <span>Produtos Cadastrados</span>
+        </div>
+        <span style="font-size: 0.85rem; color: var(--text-muted);">{{ products|length }} produtos no catálogo</span>
+      </div>
+
+      <div class="table-responsive">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>Produto</th>
+              <th>Categoria</th>
+              <th>Loja</th>
+              <th>Preço</th>
+              <th>Status</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for p in products %}
+            <tr>
+              <td>
+                <div class="table-product-cell">
+                  <img src="{{ p.image_url }}" class="table-product-thumb" alt="" onerror="this.src='https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=200';">
+                  <div>
+                    <div style="font-weight: 700; color: var(--text-main); line-height: 1.25; max-width: 260px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                      {{ p.title }}
+                    </div>
+                    {% if p.is_featured %}
+                    <span class="badge badge-star" style="margin-top: 0.2rem;"><i class="fa-solid fa-star"></i> Destaque</span>
+                    {% endif %}
+                  </div>
+                </div>
+              </td>
+              <td><span class="badge" style="background: #f1f5f9; color: var(--text-main);">{{ p.category }}</span></td>
+              <td><strong>{{ p.store }}</strong></td>
+              <td>
+                {% if p.current_price %}
+                  <strong>R$ {{ "%.2f"|format(p.current_price)|replace('.', ',') }}</strong>
+                  {% if p.original_price and p.original_price > p.current_price %}
+                  <div style="font-size: 0.75rem; text-decoration: line-through; color: var(--text-muted);">
+                    R$ {{ "%.2f"|format(p.original_price)|replace('.', ',') }}
+                  </div>
+                  {% endif %}
+                {% else %}
+                  <span style="color: var(--text-muted);">Sob consulta</span>
+                {% endif %}
+              </td>
+              <td>
+                <button onclick="toggleProductStatus({{ p.id }}, {{ 0 if p.is_active else 1 }})" class="btn btn-sm {{ 'btn-secondary' if not p.is_active else '' }}" style="background: {{ '#dcfce7' if p.is_active else '#fee2e2' }}; color: {{ '#15803d' if p.is_active else '#b91c1c' }}; cursor: pointer;">
+                  {{ 'Ativo' if p.is_active else 'Inativo' }}
+                </button>
+              </td>
+              <td>
+                <div class="actions-cell">
+                  <button onclick="toggleProductFeatured({{ p.id }}, {{ 0 if p.is_featured else 1 }})" class="btn btn-secondary btn-sm" title="{{ 'Remover destaque' if p.is_featured else 'Marcar como destaque' }}">
+                    <i class="fa-solid fa-star" style="color: {{ '#f59e0b' if p.is_featured else '#94a3b8' }};"></i>
+                  </button>
+                  <button onclick="openEditModal({{ p.id }})" class="btn btn-secondary btn-sm" title="Editar">
+                    <i class="fa-solid fa-pen"></i>
+                  </button>
+                  <button onclick="deleteProduct({{ p.id }})" class="btn btn-danger btn-sm" title="Excluir">
+                    <i class="fa-solid fa-trash"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+            {% else %}
+            <tr>
+              <td colspan="6" style="text-align: center; padding: 2rem; color: var(--text-muted);">
+                Nenhum produto cadastrado ainda. Use a ferramenta acima para cadastrar o primeiro!
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- CONFIGURAÇÕES DE REDES SOCIAIS E SLOGAN -->
+    <section class="admin-card">
+      <div class="admin-card-header">
+        <div class="admin-card-title">
+          <i class="fa-solid fa-gear"></i>
+          <span>Configurações Gerais e Redes Sociais</span>
+        </div>
+      </div>
+
+      <form action="/admin/settings" method="POST">
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Nome da Marca</label>
+            <input type="text" name="brand_name" class="form-control" value="{{ settings.get('brand_name') }}" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Slogan</label>
+            <input type="text" name="slogan" class="form-control" value="{{ settings.get('slogan') }}" required>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Instagram URL</label>
+            <input type="text" name="instagram_url" class="form-control" value="{{ settings.get('instagram_url') }}">
+          </div>
+          <div class="form-group">
+            <label class="form-label">TikTok URL</label>
+            <input type="text" name="tiktok_url" class="form-control" value="{{ settings.get('tiktok_url') }}">
+          </div>
+          <div class="form-group">
+            <label class="form-label">WhatsApp URL (ou wa.me)</label>
+            <input type="text" name="whatsapp_url" class="form-control" value="{{ settings.get('whatsapp_url') }}">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Facebook URL</label>
+            <input type="text" name="facebook_url" class="form-control" value="{{ settings.get('facebook_url') }}">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Texto de Aviso Legal (Afiliados)</label>
+          <textarea name="disclaimer" class="form-control" rows="2">{{ settings.get('disclaimer') }}</textarea>
+        </div>
+
+        <button type="submit" class="btn btn-primary">
+          <i class="fa-solid fa-floppy-disk"></i> Salvar Configurações
+        </button>
+      </form>
+    </section>
+
+  </main>
+
+  <!-- MODAL DE CADASTRO / EDIÇÃO DE PRODUTO -->
+  <div class="modal-backdrop" id="productModal">
+    <div class="modal-content">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+        <h3 id="modalTitle" style="font-size: 1.2rem; font-weight: 800; color: var(--text-main);">Produto</h3>
+        <button type="button" onclick="closeProductModal()" style="background: none; border: none; font-size: 1.25rem; color: var(--text-muted); cursor: pointer;">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <form id="productForm">
+        <input type="hidden" id="prodId" name="id" value="">
+
+        <div class="form-group">
+          <label class="form-label" for="prodTitle">Nome do Produto *</label>
+          <input type="text" id="prodTitle" name="title" class="form-control" required placeholder="ex: Fone Bluetooth Sem Fio">
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="prodCategory">Categoria *</label>
+            <select id="prodCategory" name="category" class="form-control" required>
+              <option value="🔥 Ofertas">🔥 Ofertas</option>
+              <option value="🏠 Casa">🏠 Casa</option>
+              <option value="📱 Tecnologia">📱 Tecnologia</option>
+              <option value="👗 Moda">👗 Moda</option>
+              <option value="💄 Beleza">💄 Beleza</option>
+              <option value="🐶 Pets">🐶 Pets</option>
+              <option value="🎮 Games">🎮 Games</option>
+              <option value="🎁 Achadinhos" selected>🎁 Achadinhos</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="prodStore">Loja / Plataforma *</label>
+            <input type="text" id="prodStore" name="store" class="form-control" placeholder="ex: Shopee, Amazon, Mercado Livre" required>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="prodCurrentPrice">Preço Atual (R$)</label>
+            <input type="number" step="0.01" id="prodCurrentPrice" name="current_price" class="form-control" placeholder="ex: 49.90">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="prodOriginalPrice">Preço Antigo (R$)</label>
+            <input type="number" step="0.01" id="prodOriginalPrice" name="original_price" class="form-control" placeholder="ex: 89.90">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="prodImageUrl">URL da Imagem Principal *</label>
+          <input type="url" id="prodImageUrl" name="image_url" class="form-control" placeholder="https://exemplo.com/imagem.jpg" required>
+          <div id="imagePreviewBox" style="margin-top: 0.5rem; display: none;">
+            <img id="imagePreview" src="" alt="Prévia" style="max-height: 100px; border-radius: 8px; border: 1px solid var(--admin-border);">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="prodAffiliateUrl">Link de Afiliado *</label>
+          <input type="url" id="prodAffiliateUrl" name="affiliate_url" class="form-control" placeholder="https://link-afiliado.com/..." required>
+          <small style="color: var(--text-muted); font-size: 0.75rem;">O botão VER OFERTA direcionará o visitante exatamente para este link.</small>
+        </div>
+
+        <div class="form-group" style="display: flex; gap: 1.5rem; align-items: center; margin-top: 1rem;">
+          <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.88rem; cursor: pointer;">
+            <input type="checkbox" id="prodIsFeatured" name="is_featured">
+            <strong>Marcar como Destaque (⭐ Mais procurados)</strong>
+          </label>
+          
+          <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.88rem; cursor: pointer;">
+            <input type="checkbox" id="prodIsActive" name="is_active" checked>
+            <span>Produto Ativo na Vitrine</span>
+          </label>
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; gap: 0.75rem; margin-top: 1.5rem;">
+          <button type="button" onclick="closeProductModal()" class="btn btn-secondary">Cancelar</button>
+          <button type="submit" class="btn btn-primary">
+            <i class="fa-solid fa-check"></i> Salvar Produto
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="/static/js/admin.js"></script>
+</body>
+</html>

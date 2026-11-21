@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>{{ settings.get('brand_name', 'V Variedades') }} | Ofertas e Achadinhos</title>
+  <meta name="description" content="Encontre ofertas, produtos e achadinhos selecionados das melhores lojas online.">
+  
+  <!-- Open Graph / Redes Sociais -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="{{ request_url }}">
+  <meta property="og:title" content="{{ settings.get('brand_name', 'V Variedades') }} | Ofertas e Achadinhos">
+  <meta property="og:description" content="Encontre ofertas, produtos e achadinhos selecionados das melhores lojas online.">
+  <meta property="og:image" content="/static/img/og-preview.png">
+  
+  <!-- Twitter Cards -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="{{ settings.get('brand_name', 'V Variedades') }} | Ofertas e Achadinhos">
+  <meta name="twitter:description" content="Encontre ofertas, produtos e achadinhos selecionados das melhores lojas online.">
+  
+  <!-- Favicon SVG -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><defs><linearGradient id='g' x1='0%' y1='0%' x2='100%' y2='100%'><stop offset='0%' stop-color='%236366f1'/><stop offset='100%' stop-color='%238b5cf6'/></linearGradient></defs><rect width='100' height='100' rx='25' fill='url(%23g)'/><text x='50%' y='68%' font-size='60' font-weight='900' fill='white' font-family='sans-serif' text-anchor='middle'>V</text></svg>">
+  
+  <!-- Fontes do Google -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Font Awesome Ícones -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  
+  <!-- CSS Principal -->
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+
+  <!-- CABEÇALHO COMPACTO -->
+  <header class="header-hero">
+    <div class="brand-avatar">V</div>
+    <h1 class="brand-name">{{ settings.get('brand_name', 'V Variedades') }}</h1>
+    <p class="brand-slogan">{{ settings.get('slogan', 'Achadinhos, ofertas e variedades em um só lugar!') }}</p>
+    <p class="brand-subtitle">{{ settings.get('header_subtitle', 'Os melhores achadinhos e ofertas selecionados para você.') }}</p>
+
+    <!-- ÍCONES DE REDES SOCIAIS -->
+    <div class="social-links">
+      {% if settings.get('instagram_url') %}
+      <a href="{{ settings.get('instagram_url') }}" target="_blank" rel="noopener noreferrer" class="social-btn instagram" title="Instagram">
+        <i class="fa-brands fa-instagram"></i>
+      </a>
+      {% endif %}
+
+      {% if settings.get('tiktok_url') %}
+      <a href="{{ settings.get('tiktok_url') }}" target="_blank" rel="noopener noreferrer" class="social-btn tiktok" title="TikTok">
+        <i class="fa-brands fa-tiktok"></i>
+      </a>
+      {% endif %}
+
+      {% if settings.get('whatsapp_url') %}
+      <a href="{{ settings.get('whatsapp_url') }}" target="_blank" rel="noopener noreferrer" class="social-btn whatsapp" title="WhatsApp">
+        <i class="fa-brands fa-whatsapp"></i>
+      </a>
+      {% endif %}
+
+      {% if settings.get('facebook_url') %}
+      <a href="{{ settings.get('facebook_url') }}" target="_blank" rel="noopener noreferrer" class="social-btn facebook" title="Facebook">
+        <i class="fa-brands fa-facebook-f"></i>
+      </a>
+      {% endif %}
+    </div>
+  </header>
+
+  <main class="container">
+    
+    <!-- DESTAQUE PRINCIPAL -->
+    <section class="hero-banner">
+      <h2>✨ Achadinhos que valem a pena!</h2>
+      <p>Confira produtos, ofertas e novidades que encontramos nas principais lojas online.</p>
+      <a href="#produtos-vitrine" class="btn-primary-action">
+        <span>VER TODOS OS PRODUTOS</span>
+        <i class="fa-solid fa-arrow-down"></i>
+      </a>
+    </section>
+
+    <!-- BUSCA INSTANTÂNEA -->
+    <section class="search-wrapper">
+      <div class="search-input-box">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <input type="text" id="searchInput" placeholder="🔎 O que você está procurando?" autocomplete="off">
+        <button type="button" id="clearSearch" class="clear-search-btn" title="Limpar pesquisa">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+    </section>
+
+    <!-- FILTRO DE CATEGORIAS -->
+    <nav class="categories-slider" id="categoryTabs">
+      <button class="cat-pill active" data-category="all">
+        <span>🌟 Todos</span>
+      </button>
+      <button class="cat-pill" data-category="Ofertas">
+        <span>🔥 Ofertas</span>
+      </button>
+      <button class="cat-pill" data-category="Casa">
+        <span>🏠 Casa</span>
+      </button>
+      <button class="cat-pill" data-category="Tecnologia">
+        <span>📱 Tecnologia</span>
+      </button>
+      <button class="cat-pill" data-category="Moda">
+        <span>👗 Moda</span>
+      </button>
+      <button class="cat-pill" data-category="Beleza">
+        <span>💄 Beleza</span>
+      </button>
+      <button class="cat-pill" data-category="Pets">
+        <span>🐶 Pets</span>
+      </button>
+      <button class="cat-pill" data-category="Games">
+        <span>🎮 Games</span>
+      </button>
+      <button class="cat-pill" data-category="Achadinhos">
+        <span>🎁 Achadinhos</span>
+      </button>
+    </nav>
+
+    <!-- SEÇÃO PRODUTOS EM DESTAQUE (SE HOUVER) -->
+    <div id="featuredSection" class="featured-block">
+      <div class="section-title">
+        <span>⭐ Mais procurados</span>
+        <span class="section-title-badge">Destaques</span>
+      </div>
+      <div class="products-grid" id="featuredGrid">
+        <!-- Inserido dinamicamente via JS com dados do backend -->
+      </div>
+    </div>
+
+    <!-- SEÇÃO PRINCIPAL DE PRODUTOS -->
+    <div id="produtos-vitrine">
+      <div class="section-title">
+        <span id="vitrineTitle">🔥 Ofertas e Achadinhos</span>
+        <span class="section-title-badge" id="productCount">0 itens</span>
+      </div>
+
+      <div class="products-grid" id="mainGrid">
+        <!-- Cards de produtos serão renderizados aqui -->
+      </div>
+
+      <!-- Estado vazio quando busca/filtro não retornar nada -->
+      <div id="emptyState" class="empty-state" style="display: none;">
+        <i class="fa-solid fa-box-open"></i>
+        <h3>Nenhum produto encontrado</h3>
+        <p>Tente buscar por outro termo ou escolha outra categoria acima.</p>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- RODAPÉ -->
+  <footer class="site-footer">
+    <div class="container">
+      <h3 class="footer-brand">{{ settings.get('brand_name', 'V Variedades') }}</h3>
+      <p class="footer-tagline">“{{ settings.get('slogan', 'Ofertas e achadinhos selecionados para você.') }}”</p>
+
+      <div class="footer-nav">
+        {% if settings.get('instagram_url') %}<a href="{{ settings.get('instagram_url') }}" target="_blank">Instagram</a>{% endif %}
+        {% if settings.get('tiktok_url') %}<a href="{{ settings.get('tiktok_url') }}" target="_blank">TikTok</a>{% endif %}
+        {% if settings.get('whatsapp_url') %}<a href="{{ settings.get('whatsapp_url') }}" target="_blank">WhatsApp</a>{% endif %}
+        {% if settings.get('facebook_url') %}<a href="{{ settings.get('facebook_url') }}" target="_blank">Facebook</a>{% endif %}
+        <a href="#termos" onclick="alert('Termos de Uso: Todos os preços e disponibilidades estão sujeitos a alterações pelas lojas de origem.')">Termos de Uso</a>
+        <a href="#privacidade" onclick="alert('Política de Privacidade: Não coletamos nem compartilhamos dados pessoais dos visitantes.')">Privacidade</a>
+      </div>
+
+      <div class="affiliate-disclaimer">
+        <p><strong>Aviso:</strong> {{ settings.get('disclaimer') }}</p>
+      </div>
+
+      <div class="admin-shortcut">
+        <a href="/admin/login"><i class="fa-solid fa-lock"></i> Acesso Administrativo</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Script da Vitrine -->
+  <script src="/static/js/main.js"></script>
+</body>
+</html>
